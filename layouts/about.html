@@ -1,0 +1,65 @@
+{{ define "main" }}
+{{ $p := hugo.Data.profile }}
+<section class="about-hero">
+  {{ with $p.photo }}<img class="avatar avatar--lg" src="{{ . | relURL }}" alt="{{ $p.name }}" width="132" height="132">{{ end }}
+  <div>
+    <p class="pill"><span class="spark" aria-hidden="true"></span>{{ $p.headline }}</p>
+    <h1>{{ $p.name }}</h1>
+  </div>
+</section>
+
+<div class="about-grid">
+  <section class="glass about-card about-wide">
+    <h2>소개</h2>
+    <div class="prose">{{ .Content }}</div>
+  </section>
+
+  {{ $edu := where $p.education "school" "ne" "" }}
+  {{ with $edu }}
+  <section class="glass about-card">
+    <h2>학력</h2>
+    <ul class="facts">
+      {{ range . }}
+      <li><strong>{{ .school }}</strong>
+        <span>{{ .major }}{{ with .period }} · {{ . }}{{ end }}</span>
+        {{ with .note }}<em>{{ . }}</em>{{ end }}</li>
+      {{ end }}
+    </ul>
+  </section>
+  {{ end }}
+
+  {{ with $p.certifications }}
+  <section class="glass about-card">
+    <h2>자격증</h2>
+    <ul class="facts">
+      {{ range . }}
+      <li><strong>{{ if .url }}<a href="{{ .url }}">{{ .name }}</a>{{ else }}{{ .name }}{{ end }}</strong>
+        <span>{{ .issuer }}{{ with .date }} · {{ . }}{{ end }}</span></li>
+      {{ end }}
+    </ul>
+  </section>
+  {{ end }}
+
+  {{ with $p.learning }}
+  <section class="glass about-card">
+    <h2>지금 공부하고 구축하는 것</h2>
+    <ul class="tags tags--lg">{{ range . }}<li><span class="tag">{{ . }}</span></li>{{ end }}</ul>
+  </section>
+  {{ end }}
+
+  {{ with $p.goals }}
+  <section class="glass about-card">
+    <h2>앞으로 해 볼 것</h2>
+    <ul class="goal-list">{{ range . }}<li>{{ . }}</li>{{ end }}</ul>
+  </section>
+  {{ end }}
+
+  {{ $links := where $p.links "url" "ne" "" }}
+  {{ with $links }}
+  <section class="glass about-card">
+    <h2>연락</h2>
+    <ul class="facts">{{ range . }}<li><a href="{{ .url }}">{{ .label }}</a></li>{{ end }}</ul>
+  </section>
+  {{ end }}
+</div>
+{{ end }}

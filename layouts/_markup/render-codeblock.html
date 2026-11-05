@@ -1,0 +1,9 @@
+{{- $lang := .Type | default "text" -}}
+{{- $result := transform.HighlightCodeBlock . -}}
+<figure class="code">
+  <figcaption>
+    <span>{{ $lang }}</span>
+    <button class="copy" type="button" aria-label="코드 복사">복사</button>
+  </figcaption>
+  {{ $result.Wrapped }}
+</figure>

@@ -1,0 +1,12 @@
+# 메인 화면의 "프로젝트" 목록이에요. 새 프로젝트는 아래에 항목만 추가하세요.
+# status: done(완료) / current(진행 중) / planned(예정)
+# post: 정리한 글의 주소를 적으면 제목에 링크가 걸려요.
+- name: 이 블로그
+  summary: Hugo로 만든 사이트를 GitHub Actions로 자동 빌드해서 S3와 CloudFront로 배포해요.
+  stack: [Hugo, GitHub Actions, S3, CloudFront]
+  status: current
+  post: /posts/first-post/
+- name: 홈랩
+  summary: 집에 서버를 두고 나만의 클라우드를 구축하고 운영해요. 블로그 배포를 마치면 시작해요.
+  stack: []
+  status: planned

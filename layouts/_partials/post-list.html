@@ -1,0 +1,24 @@
+<ol class="posts">
+  {{ range . }}
+  <li class="post-card" data-tags="{{ range .Params.tags }}|{{ . | lower }}{{ end }}|" data-search="{{ .Title | lower }} {{ .Description | lower }} {{ delimit .Params.tags " " | lower }}">
+    <time class="when" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01.02" }}</time>
+    <div class="post-body">
+      <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+      {{ with .Description }}
+        <p>{{ . }}</p>
+      {{ else }}
+        {{ with .Summary | plainify | truncate 110 }}<p>{{ . }}</p>{{ end }}
+      {{ end }}
+      <div class="post-meta">
+        {{ with .GetTerms "tags" }}
+        <ul class="tags">
+          {{ range . }}<li><a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a></li>{{ end }}
+        </ul>
+        {{ end }}
+        <span class="read">{{ .ReadingTime }}분 읽기</span>
+      </div>
+    </div>
+  </li>
+  {{ end }}
+</ol>
+<p class="empty" id="no-result" hidden>검색 결과가 없어요. 다른 단어로 찾아보세요.</p>
