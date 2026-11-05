@@ -1,0 +1,50 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# OIDC로 AWS 임시 권한을 받으려면 필요해요.
+permissions:
+  id-token: write
+  contents: read
+
+# 동시에 두 번 배포되지 않게 해요.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: ap-northeast-2
+  BUCKET: aqua99-blog-site-2026
+  DISTRIBUTION_ID: EHXVO3V09PJ8L
+  ROLE_ARN: arn:aws:iam::928747726758:role/aqua-blog-github-deploy
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 코드 가져오기
+        uses: actions/checkout@v4
+
+      - name: Hugo 설치
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: '0.169.0'
+          extended: true
+
+      - name: 사이트 빌드
+        run: hugo --gc --minify
+
+      - name: AWS 임시 권한 받기 (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: S3에 올리기
+        run: aws s3 sync public/ "s3://${BUCKET}/" --delete
+
+      - name: CloudFront 캐시 비우기
+        run: aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION_ID" --paths "/*"
