@@ -37,6 +37,18 @@ jobs:
       - name: 사이트 빌드
         run: hugo --gc --minify
 
+      - name: 디버그 - 토큰 정보 확인
+        run: |
+          python3 - <<'EOF'
+          import os, json, base64, urllib.request
+          url = os.environ['ACTIONS_ID_TOKEN_REQUEST_URL'] + '&audience=sts.amazonaws.com'
+          req = urllib.request.Request(url, headers={'Authorization': 'bearer ' + os.environ['ACTIONS_ID_TOKEN_REQUEST_TOKEN']})
+          part = json.load(urllib.request.urlopen(req))['value'].split('.')[1]
+          part += '=' * (-len(part) % 4)
+          claims = json.loads(base64.urlsafe_b64decode(part))
+          print({k: claims.get(k) for k in ('sub', 'aud', 'iss')})
+          EOF
+          
       - name: AWS 임시 권한 받기 (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
