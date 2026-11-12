@@ -2,7 +2,7 @@ import { compareByDateDesc } from "../dates";
 import { saveAsset, type Fetcher } from "./assets";
 import { blocksToHtml } from "./blocks";
 import { listBlocks, queryPublished, type NotionApi } from "./client";
-import { InvalidItemError, pageToItem } from "./properties";
+import { InvalidItemError, pageToItem, proofSources } from "./properties";
 import type { PortfolioItem } from "./types";
 
 export interface LoadOptions {
@@ -26,6 +26,7 @@ export async function loadPortfolio(opts: LoadOptions): Promise<PortfolioItem[]>
   });
 
   const items = published.map(pageToItem);
+  const proofsById = new Map(published.map((page) => [page.id, proofSources(page)]));
   const bySlug = new Map<string, PortfolioItem>();
   for (const item of items) {
     const other = bySlug.get(item.slug);
@@ -36,7 +37,8 @@ export async function loadPortfolio(opts: LoadOptions): Promise<PortfolioItem[]>
   for (const item of items) {
     const resolveAsset = async (url: string, suggestedName: string) =>
       opts.publicPrefix + (await saveAsset(url, suggestedName, opts.outDir, opts.fetcher));
-    item.proofUrls = await Promise.all(item.proofUrls.map((url) => resolveAsset(url, "")));
+    // 바깥 링크는 만료되지 않으므로 그대로 두고, 노션에 올린 파일만 내려받는다.
+    item.proofUrls = await Promise.all((proofsById.get(item.id) ?? []).map((p) => (p.external ? p.url : resolveAsset(p.url, ""))));
     item.bodyHtml = await blocksToHtml(await listBlocks(opts.api, item.id), { resolveAsset, warn: (m) => warn(`"${item.name}": ${m}`) });
   }
   return items.sort(compareByDateDesc);

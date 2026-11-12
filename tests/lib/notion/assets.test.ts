@@ -34,3 +34,9 @@ test("creates the output directory when it is missing", async () => {
   const name = await saveAsset("https://x/a.png", "a.png", join(dir, "deep", "notion"), okFetcher("d"));
   expect(readFileSync(join(dir, "deep", "notion", name), "utf8")).toBe("d");
 });
+
+test("only image and pdf extensions are kept, so an uploaded html or svg cannot run on the site", async () => {
+  expect(await saveAsset("https://x/a", "evil.html", dir, okFetcher("<script>1</script>"))).toMatch(/\.bin$/);
+  expect(await saveAsset("https://x/pic.svg", "", dir, okFetcher("<svg/>"))).toMatch(/\.bin$/);
+  expect(await saveAsset("https://x/a", "photo.WEBP", dir, okFetcher("w"))).toMatch(/\.webp$/);
+});

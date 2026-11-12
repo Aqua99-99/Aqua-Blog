@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeEach, expect, test } from "vitest";
 import { loadPortfolio } from "../../../src/lib/notion";
-import { fakeApi, files, loadFixture, okFetcher, rawBlock, richText, select, title, withProps } from "./helpers";
+import { fakeApi, files, loadFixture, okFetcher, rawBlock, richText, title, withProps } from "./helpers";
 
 const base = loadFixture("notion-page.json");
 const page = (id: string, props: Record<string, unknown>) => ({ ...withProps(base, props), id });
@@ -29,8 +29,18 @@ test("returns items newest first with local asset paths and body html", async ()
   expect(JSON.stringify(items)).not.toContain("amazonaws");
 });
 test("rejects duplicate slugs", async () => {
-  const dup = { queryPages: [[page("1", { 이름: title("가"), 슬러그: richText("same") }), page("2", { 이름: title("나"), 슬러그: richText("same") })]] };
-  await expect(loadPortfolio({ api: fakeApi(dup), dataSourceId: "ds", outDir: dir, publicPrefix: "/", fetcher: okFetcher("x") })).rejects.toThrow(/가.*나|나.*가/s);
+  const dup = { queryPages: [[page("1", { 이름: title("첫째"), 슬러그: richText("same") }), page("2", { 이름: title("둘째"), 슬러그: richText("same") })]] };
+  const load = loadPortfolio({ api: fakeApi(dup), dataSourceId: "ds", outDir: dir, publicPrefix: "/", fetcher: okFetcher("x") });
+  await expect(load).rejects.toThrow(/첫째/);
+  await expect(load).rejects.toThrow(/둘째/);
+});
+test("an external proof link is linked as it is and never downloaded", async () => {
+  const fetched: string[] = [];
+  const fetcher = async (url: string) => (fetched.push(url), { ok: true, status: 200, arrayBuffer: async () => new ArrayBuffer(1) });
+  const data = { queryPages: [[page("1", { 증빙: { type: "files", files: [{ name: "badge", type: "external", external: { url: "https://www.credly.com/badges/abc-123" } }] } })]] };
+  const items = await loadPortfolio({ api: fakeApi(data), dataSourceId: "ds", outDir: dir, publicPrefix: "/Aqua-Blog/notion/", fetcher });
+  expect(items[0].proofUrls).toEqual(["https://www.credly.com/badges/abc-123"]);
+  expect(fetched).toEqual([]);
 });
 test("an invalid item fails the whole load", async () => {
   const bad = { queryPages: [[page("1", { 증빙: files([]) }), page("2", { 구분: { type: "select", select: null }, 슬러그: richText("b") })]] };

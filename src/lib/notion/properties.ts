@@ -16,6 +16,18 @@ function prop<T extends Prop["type"]>(page: PageObjectResponse, name: string, ty
 
 const plain = (parts: { plain_text: string }[]) => parts.map((t) => t.plain_text).join("").trim();
 
+export interface ProofSource { url: string; /** 노션에 올린 파일이 아니라 바깥 링크인지. */ external: boolean }
+
+/** "증빙" 속성의 파일과 링크. 바깥 링크는 https 만 받는다. */
+export function proofSources(page: PageObjectResponse): ProofSource[] {
+  const out: ProofSource[] = [];
+  for (const f of prop(page, "증빙", "files").files) {
+    if ("file" in f) out.push({ url: f.file.url, external: false });
+    else if ("external" in f && /^https:\/\//i.test(f.external.url)) out.push({ url: f.external.url, external: true });
+  }
+  return out;
+}
+
 /** 노션 페이지의 속성을 포트폴리오 항목으로 바꾼다. 본문은 채우지 않는다. */
 export function pageToItem(page: PageObjectResponse): PortfolioItem {
   const name = plain(prop(page, "이름", "title").title);
@@ -31,7 +43,7 @@ export function pageToItem(page: PageObjectResponse): PortfolioItem {
   const d = prop(page, "날짜", "date").date;
   const date: DateRange | null = d ? { start: d.start.slice(0, 10), end: d.end ? d.end.slice(0, 10) : null } : null;
 
-  const proofUrls = prop(page, "증빙", "files").files.map((f) => ("file" in f ? f.file.url : "external" in f ? f.external.url : "")).filter(Boolean);
+  const proofUrls = proofSources(page).map((p) => p.url);
 
   const slugProp = page.properties["슬러그"];
   const explicitSlug = slugProp?.type === "rich_text" ? plain(slugProp.rich_text) : "";

@@ -4,12 +4,15 @@ import { join } from "node:path";
 
 export type Fetcher = (url: string) => Promise<{ ok: boolean; status: number; arrayBuffer(): Promise<ArrayBuffer> }>;
 
+/** 사이트에 그대로 올려도 브라우저가 실행하지 않는 형식만 확장자를 살린다. */
+const SAFE_EXTENSIONS = new Set(["png", "jpg", "jpeg", "gif", "webp", "avif", "pdf"]);
+
 function extension(suggestedName: string, url: string): string {
   let path = "";
   try { path = new URL(url).pathname; } catch { /* 주소가 아니면 이름만 본다 */ }
   for (const candidate of [suggestedName, path]) {
     const m = /\.([A-Za-z0-9]{1,8})$/.exec(candidate);
-    if (m) return `.${m[1].toLowerCase()}`;
+    if (m && SAFE_EXTENSIONS.has(m[1].toLowerCase())) return `.${m[1].toLowerCase()}`;
   }
   return ".bin";
 }

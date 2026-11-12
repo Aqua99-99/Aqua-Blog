@@ -37,5 +37,11 @@ test("a property missing from the database is reported by name", () => {
 
 test("the optional slug property may be absent", () => {
   const { 슬러그: _, ...rest } = page.properties;
-  expect(pageToItem({ ...page, properties: rest }).slug).toBe("2658ad03");
+  expect(pageToItem({ ...page, properties: rest }).slug).toBe("2658ad0329f08028ae2dd2aeba27c72c");
+});
+
+test("an external https proof link is kept, other schemes are dropped", () => {
+  const ext = (url: string) => ({ name: "badge", type: "external", external: { url } });
+  const item = pageToItem(withProps(page, { 증빙: { type: "files", files: [ext("https://www.credly.com/badges/abc-123"), ext("javascript:alert(1)"), ext("http://insecure.example/x")] } }));
+  expect(item.proofUrls).toEqual(["https://www.credly.com/badges/abc-123"]);
 });
