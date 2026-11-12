@@ -1,10 +1,10 @@
-+++
-date = '2026-11-05T17:20:00+09:00'
-draft = false
-title = 'GitHub Actions와 OIDC로 AWS에 자동 배포하기'
-description = '액세스 키 없이, GitHub이 보내는 신원 정보로 AWS 임시 권한을 받아 S3에 배포했다. 신뢰 정책 sub 값이 달라서 막혔던 과정도 적었다.'
-tags = ['AWS', 'IAM', 'GitHub Actions', 'OIDC', '클라우드']
-+++
+---
+title: "GitHub Actions와 OIDC로 AWS에 자동 배포하기"
+description: "액세스 키 없이, GitHub이 보내는 신원 정보로 AWS 임시 권한을 받아 S3에 배포했다. 신뢰 정책 sub 값이 달라서 막혔던 과정도 적었다."
+date: 2026-11-05T17:20:00+09:00
+tags: ["AWS", "IAM", "GitHub Actions", "OIDC", "클라우드"]
+draft: false
+---
 
 ## 오늘 배운 것
 

@@ -1,10 +1,10 @@
-+++
-date = '2026-11-05T17:10:00+09:00'
-draft = false
-title = 'S3와 CloudFront로 정적 블로그 호스팅하기'
-description = '비공개 S3 버킷에 사이트 파일을 두고, CloudFront만 읽을 수 있게 연결해서 HTTPS로 공개했다.'
-tags = ['AWS', 'S3', 'CloudFront', '클라우드']
-+++
+---
+title: "S3와 CloudFront로 정적 블로그 호스팅하기"
+description: "비공개 S3 버킷에 사이트 파일을 두고, CloudFront만 읽을 수 있게 연결해서 HTTPS로 공개했다."
+date: 2026-11-05T17:10:00+09:00
+tags: ["AWS", "S3", "CloudFront", "클라우드"]
+draft: false
+---
 
 ## 오늘 배운 것
 
