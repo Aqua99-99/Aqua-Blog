@@ -1,0 +1,60 @@
+name: 사이트 배포
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # 매일 한국 시간 06:17 (UTC 21:17). 노션에서 바꾼 내용을 하루 한 번 반영한다.
+    - cron: "17 21 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 코드 가져오기
+        uses: actions/checkout@v7
+
+      - name: Node 준비
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: 의존성 설치
+        run: npm ci
+
+      - name: 시험
+        run: npm test
+
+      # 노션 비밀값이 없거나 노션을 읽지 못하면 여기서 실패하고, 직전에 올라간 사이트가 그대로 남는다.
+      - name: 사이트 빌드 (노션 읽기 포함)
+        run: npm run build
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATA_SOURCE_ID: ${{ secrets.NOTION_DATA_SOURCE_ID }}
+
+      - name: 결과물 올리기
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: GitHub Pages에 배포
+        id: deployment
+        uses: actions/deploy-pages@v5
