@@ -1,0 +1,31 @@
+---
+import type { PortfolioItem } from "../lib/notion";
+import { formatRange } from "../lib/dates";
+
+interface Props { items: PortfolioItem[] }
+const { items } = Astro.props;
+---
+<div class="table-box">
+  <table>
+    <thead>
+      <tr><th scope="col">구분</th><th scope="col">이름</th><th scope="col">발급·주관</th><th scope="col">날짜</th><th scope="col">증빙</th></tr>
+    </thead>
+    <tbody>
+      {items.map((item) => (
+        <tr>
+          <td class="kind mono">{item.kind}</td>
+          <td class="name">{item.name}</td>
+          <td>{item.org}</td>
+          <td class="when mono">{formatRange(item.date)}</td>
+          <td class="proof">
+            {item.proofUrls.map((url, i) => (
+              <a href={url} aria-label={`${item.name} 증빙${item.proofUrls.length > 1 ? ` ${i + 1}` : ""} 보기`}>
+                {item.proofUrls.length > 1 ? `증빙 ${i + 1}` : "증빙 보기"}
+              </a>
+            ))}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>

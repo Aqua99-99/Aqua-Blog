@@ -1,0 +1,6 @@
+[
+  { "id": "fixture-1", "slug": "example-cert", "name": "예시 자격증", "kind": "자격증", "org": "예시 발급기관", "date": { "start": "2025-11-02", "end": null }, "summary": "로컬 개발용 예시 항목입니다.", "featured": true, "proofUrls": ["/favicon.svg"], "bodyHtml": "" },
+  { "id": "fixture-2", "slug": "example-course", "name": "예시 교육 수료", "kind": "수료", "org": "예시 교육기관", "date": { "start": "2025-11-29", "end": "2025-11-30" }, "summary": "로컬 개발용 예시 항목입니다.", "featured": true, "proofUrls": [], "bodyHtml": "" },
+  { "id": "fixture-3", "slug": "example-award", "name": "예시 대회 우수상", "kind": "수상", "org": "", "date": null, "summary": "날짜와 기관이 비어 있는 예시 항목입니다.", "featured": false, "proofUrls": [], "bodyHtml": "" },
+  { "id": "fixture-4", "slug": "example-activity", "name": "예시 대외활동", "kind": "대외활동", "org": "예시 주관기관", "date": { "start": "2025-08-25", "end": "2025-08-29" }, "summary": "본문이 있어 상세 화면이 만들어지는 예시 항목입니다.", "featured": true, "proofUrls": [], "bodyHtml": "<h2>활동 내용</h2><p>로컬 개발용 <strong>예시 본문</strong>입니다.</p><ul><li>첫째</li><li>둘째</li></ul>" }
+]

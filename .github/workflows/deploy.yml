@@ -1,50 +1,60 @@
-name: Deploy to AWS
+name: 사이트 배포
 
 on:
   push:
     branches: [main]
+  schedule:
+    # 매일 한국 시간 06:17 (UTC 21:17). 노션에서 바꾼 내용을 하루 한 번 반영한다.
+    - cron: "17 21 * * *"
   workflow_dispatch:
 
-# OIDC로 AWS 임시 권한을 받으려면 필요해요.
 permissions:
-  id-token: write
   contents: read
+  pages: write
+  id-token: write
 
-# 동시에 두 번 배포되지 않게 해요.
 concurrency:
-  group: deploy
+  group: pages
   cancel-in-progress: false
 
-env:
-  AWS_REGION: ap-northeast-2
-  BUCKET: aqua99-blog-site-2026
-  DISTRIBUTION_ID: EHXVO3V09PJ8L
-  ROLE_ARN: arn:aws:iam::928747726758:role/aqua-blog-github-deploy
-
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: 코드 가져오기
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
-      - name: Hugo 설치
-        uses: peaceiris/actions-hugo@v3
+      - name: Node 준비
+        uses: actions/setup-node@v7
         with:
-          hugo-version: '0.169.0'
-          extended: true
+          node-version: 22
+          cache: npm
 
-      - name: 사이트 빌드
-        run: hugo --gc --minify
-     
-      - name: AWS 임시 권한 받기 (OIDC)
-        uses: aws-actions/configure-aws-credentials@v4
+      - name: 의존성 설치
+        run: npm ci
+
+      - name: 시험
+        run: npm test
+
+      # 노션 비밀값이 없거나 노션을 읽지 못하면 여기서 실패하고, 직전에 올라간 사이트가 그대로 남는다.
+      - name: 사이트 빌드 (노션 읽기 포함)
+        run: npm run build
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATA_SOURCE_ID: ${{ secrets.NOTION_DATA_SOURCE_ID }}
+
+      - name: 결과물 올리기
+        uses: actions/upload-pages-artifact@v5
         with:
-          role-to-assume: ${{ env.ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
+          path: dist
 
-      - name: S3에 올리기
-        run: aws s3 sync public/ "s3://${BUCKET}/" --delete
-
-      - name: CloudFront 캐시 비우기
-        run: aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION_ID" --paths "/*"
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: GitHub Pages에 배포
+        id: deployment
+        uses: actions/deploy-pages@v5

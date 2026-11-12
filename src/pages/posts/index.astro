@@ -1,0 +1,19 @@
+---
+import Base from "../../layouts/Base.astro";
+import PostList from "../../components/PostList.astro";
+import { getPosts } from "../../lib/posts";
+import { withBase } from "../../lib/paths";
+
+const posts = await getPosts();
+const tags = [...new Set(posts.flatMap((p) => p.data.tags))].sort((a, b) => a.localeCompare(b, "ko"));
+---
+<Base title="글" description="공부한 내용을 하나씩 정리해서 올리는 곳입니다.">
+  <header class="page-head">
+    <h1>글</h1>
+    <p>공부한 내용을 하나씩 정리해서 올립니다.</p>
+  </header>
+  <ul class="tags" aria-label="태그">
+    {tags.map((tag) => <li><a href={withBase(`/tags/${tag}/`)}>#{tag}</a></li>)}
+  </ul>
+  <PostList posts={posts} />
+</Base>

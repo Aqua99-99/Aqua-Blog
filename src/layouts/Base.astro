@@ -1,0 +1,54 @@
+---
+import "../styles/global.css";
+import { profile } from "../data/site";
+import { withBase } from "../lib/paths";
+
+interface Props { title: string; description?: string }
+const { title, description = profile.tagline } = Astro.props;
+const fullTitle = title === "황준현" ? title : `${title} · 황준현`;
+const menu = [
+  { href: "/portfolio/", label: "포트폴리오" },
+  { href: "/posts/", label: "글" },
+  { href: "/about/", label: "소개" },
+];
+const here = Astro.url.pathname;
+---
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <link rel="icon" type="image/svg+xml" href={withBase("/favicon.svg")} />
+    <link rel="alternate" type="application/rss+xml" title="황준현 블로그" href={withBase("/rss.xml")} />
+    <link rel="sitemap" href={withBase("/sitemap-index.xml")} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" />
+  </head>
+  <body>
+    <div class="wrap">
+      <nav class="site-nav" aria-label="주 메뉴">
+        <a class="brand" href={withBase("/")}>황준현</a>
+        <ul>
+          {menu.map((m) => (
+            <li><a href={withBase(m.href)} aria-current={here.startsWith(withBase(m.href)) ? "page" : undefined}>{m.label}</a></li>
+          ))}
+        </ul>
+      </nav>
+      <main><slot /></main>
+      <footer class="site-footer">
+        <span>황준현</span>
+        <span class="links">
+          <a href={profile.github}>GitHub</a>
+          <a href={`mailto:${profile.email}`}>{profile.email}</a>
+        </span>
+      </footer>
+    </div>
+  </body>
+</html>

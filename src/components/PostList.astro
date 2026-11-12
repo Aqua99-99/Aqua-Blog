@@ -1,0 +1,19 @@
+---
+import type { Post } from "../lib/posts";
+import { formatDate } from "../lib/dates";
+import { withBase } from "../lib/paths";
+
+interface Props { posts: Post[] }
+const { posts } = Astro.props;
+---
+<div class="rows">
+  {posts.map((post) => (
+    <a class="row" href={withBase(`/posts/${post.id}/`)}>
+      <span class="when mono">{formatDate(post.data.date)}</span>
+      <span class="main">
+        <span class="title">{post.data.title}</span>
+        <span class="sub">{post.data.tags.join(" · ")}</span>
+      </span>
+    </a>
+  ))}
+</div>
