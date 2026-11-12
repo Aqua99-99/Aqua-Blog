@@ -1,6 +1,68 @@
 ---
 import Base from "../layouts/Base.astro";
+import PostList from "../components/PostList.astro";
+import { profile } from "../data/site";
+import { formatRange } from "../lib/dates";
+import { withBase } from "../lib/paths";
+import { getPortfolio } from "../lib/portfolio";
+import { getPosts } from "../lib/posts";
+
+const items = await getPortfolio();
+const featured = items.filter((i) => i.featured);
+const credentials = featured.filter((i) => i.kind !== "대외활동").slice(0, 4);
+const activities = featured.filter((i) => i.kind === "대외활동").slice(0, 3);
+const posts = (await getPosts()).slice(0, 3);
 ---
-<Base title="황준현">
-  <section class="hero"><h1>황준현</h1></section>
+<Base title={profile.name} description={profile.tagline}>
+  <header class="hero">
+    <div class="mono">{profile.affiliation}</div>
+    <h1>{profile.name}</h1>
+    <p class="lead">{profile.tagline}</p>
+    <div class="buttons">
+      <a class="btn primary" href={withBase("/portfolio/")}>포트폴리오 보기</a>
+      <a class="btn" href={profile.github}>GitHub</a>
+    </div>
+  </header>
+
+  {credentials.length > 0 && (
+    <section class="strip" aria-label="대표 자격증과 수료">
+      {credentials.map((item) => (
+        <div>
+          <span class="mono">{item.kind}</span>
+          <span class="name">{item.name}</span>
+        </div>
+      ))}
+    </section>
+  )}
+
+  {activities.length > 0 && (
+    <section class="section">
+      <div class="section-head">
+        <h2>주요 활동</h2>
+        <a href={withBase("/portfolio/")}>전체 보기</a>
+      </div>
+      <div class="cards">
+        {activities.map((item) => {
+          const inner = (
+            <>
+              <span class="mono">{[formatRange(item.date), item.org].filter(Boolean).join(" · ")}</span>
+              <h3>{item.name}</h3>
+              {item.summary && <p>{item.summary}</p>}
+            </>
+          );
+          return item.bodyHtml
+            ? <a class="card" href={withBase(`/portfolio/${item.slug}/`)}>{inner}</a>
+            : <div class="card">{inner}</div>;
+        })}
+      </div>
+    </section>
+  )}
+
+  <section class="section">
+    <div class="section-head">
+      <h2>최근 글</h2>
+      <a href={withBase("/posts/")}>글 전체 보기</a>
+    </div>
+    <PostList posts={posts} />
+  </section>
 </Base>

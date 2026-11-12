@@ -1,9 +1,10 @@
 ---
 import "../styles/global.css";
+import { profile } from "../data/site";
 import { withBase } from "../lib/paths";
 
 interface Props { title: string; description?: string }
-const { title, description = "클라우드 보안을 공부하며, 배운 것과 막힌 곳을 그대로 기록합니다." } = Astro.props;
+const { title, description = profile.tagline } = Astro.props;
 const fullTitle = title === "황준현" ? title : `${title} · 황준현`;
 const menu = [
   { href: "/portfolio/", label: "포트폴리오" },
@@ -44,8 +45,8 @@ const here = Astro.url.pathname;
       <footer class="site-footer">
         <span>황준현</span>
         <span class="links">
-          <a href="https://github.com/Aqua99-99">GitHub</a>
-          <a href="mailto:dkzndk1223@gmail.com">dkzndk1223@gmail.com</a>
+          <a href={profile.github}>GitHub</a>
+          <a href={`mailto:${profile.email}`}>{profile.email}</a>
         </span>
       </footer>
     </div>

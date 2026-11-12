@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { resolveSource } from "../../src/lib/portfolio";
+import { assetOutDir, resolveSource } from "../../src/lib/portfolio";
 
 test("uses notion when both secrets are set", () => {
   expect(resolveSource({ NOTION_TOKEN: "t", NOTION_DATA_SOURCE_ID: "d", DEV: false })).toBe("notion");
@@ -14,4 +14,9 @@ test("falls back to fixtures only in dev", () => {
 test("PORTFOLIO_FIXTURES=1 forces fixtures", () => {
   expect(resolveSource({ DEV: false, PORTFOLIO_FIXTURES: "1" })).toBe("fixtures");
   expect(resolveSource({ NOTION_TOKEN: "t", NOTION_DATA_SOURCE_ID: "d", DEV: false, PORTFOLIO_FIXTURES: "1" })).toBe("fixtures");
+});
+
+test("downloads go into the build output, because public/ is copied before pages render", () => {
+  expect(assetOutDir(false)).toBe("dist/notion");
+  expect(assetOutDir(true)).toBe("public/notion");
 });

@@ -1,0 +1,18 @@
+---
+import type { Project } from "../data/site";
+
+interface Props { projects: Project[] }
+const { projects } = Astro.props;
+---
+<div class="cards">
+  {projects.map((project) => (
+    <div class="card">
+      <h3>{project.name}</h3>
+      <p>{project.summary}</p>
+      <div class="links">
+        <a href={project.repo} aria-label={`${project.name} GitHub 저장소`}>GitHub에서 보기</a>
+        {project.live && <a href={project.live} aria-label={`${project.name} 서비스 열기`}>서비스 열기</a>}
+      </div>
+    </div>
+  ))}
+</div>

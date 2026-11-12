@@ -1,0 +1,21 @@
+---
+import type { PortfolioItem } from "../lib/notion";
+import { formatRange } from "../lib/dates";
+import { withBase } from "../lib/paths";
+
+interface Props { items: PortfolioItem[] }
+const { items } = Astro.props;
+---
+<div class="rows">
+  {items.map((item) => (
+    <div class="row">
+      <div class="when mono">{formatRange(item.date)}</div>
+      <div class="main">
+        <div class="title">{item.name}</div>
+        {item.org && <div class="sub">{item.org}</div>}
+        {item.summary && <div class="desc">{item.summary}</div>}
+        {item.bodyHtml && <a class="more" href={withBase(`/portfolio/${item.slug}/`)} aria-label={`${item.name} 자세히 보기`}>자세히 보기</a>}
+      </div>
+    </div>
+  ))}
+</div>

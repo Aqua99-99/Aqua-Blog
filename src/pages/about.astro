@@ -1,0 +1,30 @@
+---
+import Base from "../layouts/Base.astro";
+import { profile } from "../data/site";
+---
+<Base title="소개" description={`${profile.name} · ${profile.affiliation}`}>
+  <header class="page-head">
+    <h1>소개</h1>
+    <p>{profile.tagline}</p>
+  </header>
+  <section>
+    <div class="section-head"><h2>학력</h2></div>
+    <dl class="dl">
+      {profile.education.map((e) => (
+        <>
+          <dt class="mono">{e.period}</dt>
+          <dd>{e.school} {e.major}</dd>
+        </>
+      ))}
+    </dl>
+  </section>
+  <section class="section">
+    <div class="section-head"><h2>연락처</h2></div>
+    <dl class="dl">
+      <dt>GitHub</dt>
+      <dd><a href={profile.github}>{profile.github.replace("https://", "")}</a></dd>
+      <dt>이메일</dt>
+      <dd><a href={`mailto:${profile.email}`}>{profile.email}</a></dd>
+    </dl>
+  </section>
+</Base>
