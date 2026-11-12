@@ -24,3 +24,21 @@ export const image = (url: string, caption = "") => node("image", { type: "file"
 export const file = (url: string, name: string) => node("file", { type: "file", file: { url }, name, caption: [] });
 export const divider = () => node("divider", {});
 export const unsupported = (type: string) => node(type, {});
+
+// ── 가짜 노션 API ──
+type Paged = { results: unknown[]; has_more: boolean; next_cursor: string | null };
+const paged = (pages: unknown[][], cursor: string | undefined): Paged => {
+  const i = cursor ? Number(cursor.split("-")[1]) : 0;
+  const more = i + 1 < pages.length;
+  return { results: pages[i] ?? [], has_more: more, next_cursor: more ? `cursor-${i + 1}` : null };
+};
+export function fakeApi(data: { queryPages?: unknown[][]; blocks?: Record<string, unknown[][]> }) {
+  const calls = { query: [] as any[], blocks: [] as any[] };
+  return {
+    calls,
+    dataSources: { query: async (args: any) => (calls.query.push(args), paged(data.queryPages ?? [[]], args.start_cursor)) },
+    blocks: { children: { list: async (args: any) => (calls.blocks.push(args), paged(data.blocks?.[args.block_id] ?? [[]], args.start_cursor)) } },
+  };
+}
+export const okFetcher = (body: string) => async (_url: string) => ({ ok: true, status: 200, arrayBuffer: async () => new TextEncoder().encode(body).buffer as ArrayBuffer });
+export const rawBlock = (id: string, hasChildren: boolean, type = "paragraph", data: unknown = { rich_text: [text(id)] }) => ({ object: "block", id, type, has_children: hasChildren, [type]: data });
