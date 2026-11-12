@@ -1,12 +1,8 @@
-# Hugo 빌드 결과물과 캐시
-/public/
-/resources/_gen/
-.hugo_build.lock
-
-# 안 쓰는 예전 파일
-/_to_delete/
-/themes/
-.gitmodules
+node_modules/
+dist/
+.astro/
+public/notion/
+.superpowers/
 
 # 에디터·운영체제
 .vscode/
