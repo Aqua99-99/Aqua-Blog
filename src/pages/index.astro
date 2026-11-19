@@ -5,9 +5,10 @@ import { profile } from "../data/site";
 import { formatRange } from "../lib/dates";
 import { withBase } from "../lib/paths";
 import { getPortfolio } from "../lib/portfolio";
+import { isPost } from "../lib/notion/types";
 import { getPosts } from "../lib/posts";
 
-const items = await getPortfolio();
+const items = (await getPortfolio()).filter((i) => !isPost(i));
 const featured = items.filter((i) => i.featured);
 const credentials = featured.filter((i) => i.kind !== "대외활동").slice(0, 4);
 const activities = featured.filter((i) => i.kind === "대외활동").slice(0, 3);

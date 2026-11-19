@@ -47,9 +47,37 @@ test("files become links named after the file", async () => {
 });
 test("skips unsupported blocks with a warning", async () => {
   const c = ctx();
-  expect(await blocksToHtml([para([text("앞")]), unsupported("table"), para([text("뒤")])], c)).toBe("<p>앞</p><p>뒤</p>");
-  expect(c.warnings).toEqual([expect.stringContaining("table")]);
+  expect(await blocksToHtml([para([text("앞")]), unsupported("embed"), para([text("뒤")])], c)).toBe("<p>앞</p><p>뒤</p>");
+  expect(c.warnings).toEqual([expect.stringContaining("embed")]);
 });
 test("drops empty paragraphs", async () => {
   expect(await blocksToHtml([para([]), para([text("")]), para([text("  ")])], ctx())).toBe("");
+});
+
+import { callout, paraWith, table, todo, toggle } from "./helpers";
+
+test("soft line breaks become <br>", async () => {
+  expect(await blocksToHtml([para([text("첫 줄\n둘째 줄")])], ctx())).toBe("<p>첫 줄<br>둘째 줄</p>");
+});
+test("children of a paragraph are rendered after it", async () => {
+  expect(await blocksToHtml([paraWith("위", [bullet("아래")])], ctx())).toBe('<p>위</p><div class="indent"><ul><li>아래</li></ul></div>');
+});
+test("toggle becomes details and summary", async () => {
+  expect(await blocksToHtml([toggle("대응 방법", [para([text("서버에서 검증")])])], ctx()))
+    .toBe("<details><summary>대응 방법</summary><p>서버에서 검증</p></details>");
+});
+test("callout keeps its emoji as decoration", async () => {
+  expect(await blocksToHtml([callout("실습 환경에서만", "🧪")], ctx()))
+    .toBe('<aside class="callout"><span aria-hidden="true">🧪</span><div>실습 환경에서만</div></aside>');
+});
+test("to-do items show a disabled checkbox", async () => {
+  expect(await blocksToHtml([todo("완료", true), todo("남음", false)], ctx()))
+    .toBe('<ul class="todo"><li><input type="checkbox" checked disabled aria-label="완료됨"> 완료</li><li><input type="checkbox" disabled aria-label="미완료"> 남음</li></ul>');
+});
+test("table with a header row", async () => {
+  expect(await blocksToHtml([table([["주차", "주제"], ["1", "<개요>"]])], ctx()))
+    .toBe('<div class="table-scroll"><table><thead><tr><th scope="col">주차</th><th scope="col">주제</th></tr></thead><tbody><tr><td>1</td><td>&lt;개요&gt;</td></tr></tbody></table></div>');
+});
+test("table without a header row", async () => {
+  expect(await blocksToHtml([table([["a", "b"]], false)], ctx())).toBe('<div class="table-scroll"><table><tbody><tr><td>a</td><td>b</td></tr></tbody></table></div>');
 });

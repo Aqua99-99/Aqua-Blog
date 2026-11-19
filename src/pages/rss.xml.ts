@@ -10,10 +10,10 @@ export async function GET(context: APIContext) {
     description: "클라우드 보안을 공부하며, 배운 것과 막힌 곳을 그대로 기록합니다.",
     site: new URL(withBase("/"), context.site),
     items: posts.map((post) => ({
-      title: post.data.title,
-      description: post.data.description,
-      pubDate: post.data.date,
-      link: withBase(`/posts/${post.id}/`),
+      title: post.title,
+      description: post.description,
+      pubDate: post.date,
+      link: withBase(`/posts/${post.slug}/`),
     })),
   });
 }

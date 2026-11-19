@@ -48,9 +48,9 @@ test("an invalid item fails the whole load", async () => {
 });
 test("warnings from unsupported blocks name the item", async () => {
   const warnings: string[] = [];
-  const data = { queryPages: [[page("1", { 이름: title("연수"), 증빙: files([]) })]], blocks: { "1": [[rawBlock("t", false, "table", {})]] } };
+  const data = { queryPages: [[page("1", { 이름: title("연수"), 증빙: files([]) })]], blocks: { "1": [[rawBlock("t", false, "embed", {})]] } };
   await loadPortfolio({ api: fakeApi(data), dataSourceId: "ds", outDir: dir, publicPrefix: "/", warn: (m) => warnings.push(m) });
-  expect(warnings).toEqual([expect.stringMatching(/연수.*table/)]);
+  expect(warnings).toEqual([expect.stringMatching(/연수.*embed/)]);
 });
 test("drops an unpublished page even if the api returns it", async () => {
   const data = { queryPages: [[page("1", { 이름: title("비공개 메모"), 공개: { type: "checkbox", checkbox: false }, 증빙: files([]) })]] };

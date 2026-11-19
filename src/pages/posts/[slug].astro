@@ -1,27 +1,31 @@
 ---
 import { render } from "astro:content";
 import Base from "../../layouts/Base.astro";
-import { getPosts } from "../../lib/posts";
+import { getMarkdownPosts, getPosts } from "../../lib/posts";
 import { formatDate } from "../../lib/dates";
 import { withBase } from "../../lib/paths";
 
 export async function getStaticPaths() {
-  return (await getPosts()).map((post) => ({ params: { slug: post.id }, props: { post } }));
+  const markdown = new Map((await getMarkdownPosts()).map((entry) => [entry.id, entry]));
+  return (await getPosts()).map((post) => ({
+    params: { slug: post.slug },
+    props: { post, entry: post.source === "markdown" ? markdown.get(post.slug) : undefined },
+  }));
 }
-const { post } = Astro.props;
-const { Content } = await render(post);
+const { post, entry } = Astro.props;
+const Content = entry ? (await render(entry)).Content : null;
 ---
-<Base title={post.data.title} description={post.data.description}>
+<Base title={post.title} description={post.description}>
   <article>
     <header class="page-head">
-      <div class="mono">{formatDate(post.data.date)}</div>
-      <h1>{post.data.title}</h1>
-      <p>{post.data.description}</p>
+      <div class="mono">{formatDate(post.date)}</div>
+      <h1>{post.title}</h1>
+      <p>{post.description}</p>
       <ul class="tags">
-        {post.data.tags.map((tag) => <li><a href={withBase(`/tags/${tag}/`)}>#{tag}</a></li>)}
+        {post.tags.map((tag) => <li><a href={withBase(`/tags/${tag}/`)}>#{tag}</a></li>)}
       </ul>
     </header>
-    <div class="prose"><Content /></div>
+    {Content ? <div class="prose"><Content /></div> : <div class="prose" set:html={post.bodyHtml} />}
     <a class="back" href={withBase("/posts/")}>글 목록으로 돌아가기</a>
   </article>
 </Base>

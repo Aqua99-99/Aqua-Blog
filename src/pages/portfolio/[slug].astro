@@ -3,10 +3,11 @@ import Base from "../../layouts/Base.astro";
 import { formatRange } from "../../lib/dates";
 import { withBase } from "../../lib/paths";
 import { getPortfolio } from "../../lib/portfolio";
+import { isPost } from "../../lib/notion/types";
 
 export async function getStaticPaths() {
   const items = await getPortfolio();
-  return items.filter((item) => item.bodyHtml !== "").map((item) => ({ params: { slug: item.slug }, props: { item } }));
+  return items.filter((item) => !isPost(item) && item.bodyHtml !== "").map((item) => ({ params: { slug: item.slug }, props: { item } }));
 }
 const { item } = Astro.props;
 const meta = [item.kind, formatRange(item.date), item.org].filter(Boolean).join(" · ");

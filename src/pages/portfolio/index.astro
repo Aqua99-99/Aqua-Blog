@@ -5,8 +5,9 @@ import CertTable from "../../components/CertTable.astro";
 import ProjectCards from "../../components/ProjectCards.astro";
 import { projects } from "../../data/site";
 import { getPortfolio } from "../../lib/portfolio";
+import { isPost } from "../../lib/notion/types";
 
-const items = await getPortfolio();
+const items = (await getPortfolio()).filter((i) => !isPost(i));
 const credentials = items.filter((i) => i.kind !== "대외활동");
 const activities = items.filter((i) => i.kind === "대외활동");
 ---
