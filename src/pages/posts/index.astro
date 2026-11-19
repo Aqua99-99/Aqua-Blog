@@ -5,7 +5,7 @@ import { getPosts } from "../../lib/posts";
 import { withBase } from "../../lib/paths";
 
 const posts = await getPosts();
-const tags = [...new Set(posts.flatMap((p) => p.data.tags))].sort((a, b) => a.localeCompare(b, "ko"));
+const tags = [...new Set(posts.flatMap((p) => p.tags))].sort((a, b) => a.localeCompare(b, "ko"));
 ---
 <Base title="글" description="공부한 내용을 하나씩 정리해서 올리는 곳입니다.">
   <header class="page-head">

@@ -98,3 +98,15 @@ a.row:hover .title { color: var(--accent); }
 .dl { display: grid; grid-template-columns: minmax(96px, auto) 1fr; gap: 12px 28px; margin: 0; }
 .dl dt { color: var(--muted); font-size: 14px; padding-top: 2px; }
 .dl dd { margin: 0; }
+
+.prose .indent { padding-left: 24px; }
+.prose details { margin: 0 0 20px; border: 1px solid var(--line); border-radius: 6px; padding: 12px 16px; background: #fff; }
+.prose details > summary { cursor: pointer; font-weight: 600; min-height: 28px; }
+.prose details[open] > summary { margin-bottom: 12px; }
+.prose .callout { display: flex; gap: 12px; margin: 0 0 20px; padding: 16px 18px; border-radius: 6px; background: #EEF3F8; }
+.prose .callout > div > :last-child { margin-bottom: 0; }
+.prose ul.todo { list-style: none; padding-left: 4px; }
+.prose ul.todo input { margin-right: 6px; }
+.prose .table-scroll { overflow-x: auto; margin: 0 0 20px; }
+.prose .table-scroll table { display: table; margin: 0; min-width: 100%; }
+.prose th { background: #F0F2F5; font-weight: 600; }

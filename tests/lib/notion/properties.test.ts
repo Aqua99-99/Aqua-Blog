@@ -45,3 +45,17 @@ test("an external https proof link is kept, other schemes are dropped", () => {
   const item = pageToItem(withProps(page, { 증빙: { type: "files", files: [ext("https://www.credly.com/badges/abc-123"), ext("javascript:alert(1)"), ext("http://insecure.example/x")] } }));
   expect(item.proofUrls).toEqual(["https://www.credly.com/badges/abc-123"]);
 });
+
+const multi = (names: string[]) => ({ type: "multi_select", multi_select: names.map((name) => ({ name })) });
+
+test("tags come from the optional 태그 property", () => {
+  expect(pageToItem(withProps(page, { 태그: multi(["웹해킹", "해킹기초"]) })).tags).toEqual(["웹해킹", "해킹기초"]);
+  const { 태그: _, ...rest } = withProps(page, {}).properties;
+  expect(pageToItem({ ...page, properties: rest }).tags).toEqual([]);
+});
+test("a study post needs a date and a summary", () => {
+  const post = (props: Record<string, unknown>) => withProps(page, { 구분: select("공부 글"), ...props });
+  expect(pageToItem(post({})).kind).toBe("공부 글");
+  expect(() => pageToItem(post({ 날짜: { type: "date", date: null } }))).toThrow(/날짜/);
+  expect(() => pageToItem(post({ 요약: richText("") }))).toThrow(/요약/);
+});

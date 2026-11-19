@@ -54,8 +54,22 @@ test("home shows featured items, activities and recent posts", () => {
   expect(html).toContain("예시 자격증");
   expect(html).not.toContain("예시 대회 우수상");
   expect(html).toContain(`href="${BASE}/portfolio/example-activity/"`);
-  expect(html).toContain("블로그를 시작하며");
+  expect(html.match(/href="\/Aqua-Blog\/posts\/[^"]+\/"/g)).toHaveLength(3);
 });
 test("detail page renders the body html", () => {
   expect(readFileSync("dist/portfolio/example-activity/index.html", "utf8")).toContain("<strong>예시 본문</strong>");
+});
+
+test("a notion study post is listed with the markdown posts and has its own page", () => {
+  const list = readFileSync("dist/posts/index.html", "utf8");
+  expect(list).toContain("예시 공부 글");
+  expect(list).toContain("블로그를 시작하며");
+  expect(readFileSync("dist/posts/example-post/index.html", "utf8")).toContain("<strong>예시 본문</strong>");
+  expect(existsSync("dist/tags/예시/index.html")).toBe(true);
+  expect(readFileSync("dist/rss.xml", "utf8")).toContain("example-post");
+  expect(readFileSync("dist/index.html", "utf8")).toContain("예시 공부 글");
+});
+test("study posts stay out of the portfolio", () => {
+  expect(readFileSync("dist/portfolio/index.html", "utf8")).not.toContain("예시 공부 글");
+  expect(existsSync("dist/portfolio/example-post/index.html")).toBe(false);
 });

@@ -42,3 +42,11 @@ export function fakeApi(data: { queryPages?: unknown[][]; blocks?: Record<string
 }
 export const okFetcher = (body: string) => async (_url: string) => ({ ok: true, status: 200, arrayBuffer: async () => new TextEncoder().encode(body).buffer as ArrayBuffer });
 export const rawBlock = (id: string, hasChildren: boolean, type = "paragraph", data: unknown = { rich_text: [text(id)] }) => ({ object: "block", id, type, has_children: hasChildren, [type]: data });
+
+// ── 공부 글용 블록 ──
+export const toggle = (s: string, children: any[]) => node("toggle", { rich_text: [text(s)] }, children);
+export const callout = (s: string, emoji = "💡") => node("callout", { rich_text: [text(s)], icon: { type: "emoji", emoji } });
+export const todo = (s: string, checked: boolean) => node("to_do", { rich_text: [text(s)], checked });
+export const paraWith = (s: string, children: any[]) => node("paragraph", { rich_text: [text(s)] }, children);
+const row = (cells: string[]) => node("table_row", { cells: cells.map((c) => [text(c)]) });
+export const table = (rows: string[][], header = true) => node("table", { table_width: rows[0].length, has_column_header: header, has_row_header: false }, rows.map(row));

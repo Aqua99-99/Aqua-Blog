@@ -54,6 +54,14 @@ export function pageToItem(page: PageObjectResponse): PortfolioItem {
     throw new InvalidItemError(`${where}: ${(e as Error).message}`);
   }
 
+  const tagProp = page.properties["태그"];
+  const tags = tagProp?.type === "multi_select" ? tagProp.multi_select.map((t) => t.name) : [];
+  const summary = plain(prop(page, "요약", "rich_text").rich_text);
+  if (kind === "공부 글") {
+    if (!date) throw new InvalidItemError(`${where}: 공부 글에는 "날짜"(게시일)가 필요합니다.`);
+    if (summary === "") throw new InvalidItemError(`${where}: 공부 글에는 "요약"(글 목록의 한 줄 설명)이 필요합니다.`);
+  }
+
   return {
     id: page.id,
     slug,
@@ -61,8 +69,9 @@ export function pageToItem(page: PageObjectResponse): PortfolioItem {
     kind: kind as PortfolioKind,
     org: plain(prop(page, "기관", "rich_text").rich_text),
     date,
-    summary: plain(prop(page, "요약", "rich_text").rich_text),
+    summary,
     featured: prop(page, "대표", "checkbox").checkbox,
+    tags,
     proofUrls,
     bodyHtml: "",
   };

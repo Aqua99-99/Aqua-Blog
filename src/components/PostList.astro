@@ -1,18 +1,18 @@
 ---
-import type { Post } from "../lib/posts";
+import type { PostSummary } from "../lib/posts";
 import { formatDate } from "../lib/dates";
 import { withBase } from "../lib/paths";
 
-interface Props { posts: Post[] }
+interface Props { posts: PostSummary[] }
 const { posts } = Astro.props;
 ---
 <div class="rows">
   {posts.map((post) => (
-    <a class="row" href={withBase(`/posts/${post.id}/`)}>
-      <span class="when mono">{formatDate(post.data.date)}</span>
+    <a class="row" href={withBase(`/posts/${post.slug}/`)}>
+      <span class="when mono">{formatDate(post.date)}</span>
       <span class="main">
-        <span class="title">{post.data.title}</span>
-        <span class="sub">{post.data.tags.join(" · ")}</span>
+        <span class="title">{post.title}</span>
+        <span class="sub">{post.tags.join(" · ")}</span>
       </span>
     </a>
   ))}
